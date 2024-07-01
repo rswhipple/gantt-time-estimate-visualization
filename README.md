@@ -10,14 +10,7 @@ A Python script to visualize a imaginary Task Management App's project timeline/
 
 2. **Run the Docker Container**:
    ```sh
-   docker run -it my-python-env
+   docker run -it --rm my-python-env
    ```
 
-This will start a Docker container with a virtual Python environment set up, and you will be dropped into a bash shell within the container. You can then activate the virtual environment manually and run any Python scripts or commands you need.
-
-
-### Manual Activation in the Container
-Once inside the container, activate the virtual environment:
-```sh
-source venv/bin/activate
-```
+Adjust -it for interactive mode if needed, and --rm to automatically remove the container when it exits. This command starts a container from the my-python-app image and runs your application as specified in the CMD directive.
