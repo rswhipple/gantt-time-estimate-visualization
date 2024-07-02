@@ -1,0 +1,8 @@
+# compose.yml
+
+services:
+  test:
+    build: .
+    command: ["python3", "/code/src/gantt_script.py"]
+    volumes:
+      - .:/code
