@@ -1,5 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.dates as mdates
+from matplotlib.ticker import MultipleLocator, AutoMinorLocator
+
+plt.style.use('ggplot')
 
 # Define your tasks data with week numbers and durations
 tasks = [
@@ -28,34 +32,51 @@ tasks = [
     {'task': 'Security Implementation', 'week': 29, 'duration': 2},
 ]
 
-# Convert week numbers to actual start dates based on your project start date and duration
+# Convert week numbers to actual start dates 
 project_start_date = '2024-07-01'  # Adjust this based on your project's actual start date
 
 for task in tasks:
     start_date = np.datetime64(project_start_date) + np.timedelta64((task['week'] - 1) * 7, 'D')
     task['start_date'] = start_date
 
-# Convert start dates to formatted strings if needed
-# Example: task['start_date'] = task['start_date'].astype('datetime64[D]').astype(str)
-
 # Create figure and axes
-fig, ax = plt.subplots(figsize=(12, 8))
+fig, ax = plt.subplots(figsize=(40, 8))
 
 # Plot each task as a horizontal bar
 for i, task in enumerate(tasks):
-    ax.barh(task['task'], left=task['start_date'], width=task['duration']*7, height=0.5, align='center', alpha=0.8, label='Task Duration')
+    ax.barh(task['task'], left=task['start_date'], width=task['duration']*7, height=0.5, align='center', alpha=0.8)
 
-# Format x-axis
+# Format x-axis with major and minor ticks
 ax.set_xlabel('Timeline (Weeks)')
-ax.set_xlim(np.datetime64(project_start_date), np.datetime64(project_start_date) + np.timedelta64(52 * 7, 'D'))  # Assuming 52 weeks in a year
-ax.xaxis.set_major_locator(plt.MaxNLocator(10))  # Adjust as needed
+weeks = np.arange(1, 53)
+week_dates = [np.datetime64(project_start_date) + np.timedelta64((week - 1) * 7, 'D') for week in weeks]
+
+# Set major ticks every 4 weeks
+major_locator = MultipleLocator(base=4*7)  # 4 weeks in days
+ax.xaxis.set_major_locator(major_locator)
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+
+# Set minor ticks every week
+minor_locator = AutoMinorLocator(n=4)  # 4 minor ticks between each major tick
+ax.xaxis.set_minor_locator(minor_locator)
+
+# Add grid in the background
+ax.grid(visible=True, which='both', linestyle='--', linewidth=0.5, color='gray')
+
+# Set x-axis labels to "Week X"
+months = np.arange(1, 14)  # Adjust range as needed
+ax.set_xticks(week_dates[::4])  # Set ticks at every 4 weeks
+ax.set_xticklabels([f'Month {month}' for month in range(1, len(week_dates[::4]) + 1)])
+
+ax.set_xlim(np.datetime64(project_start_date), np.datetime64(project_start_date) + np.timedelta64(52 * 7, 'D'))
 
 # Format y-axis
 ax.set_yticks(np.arange(len(tasks)))
 ax.set_yticklabels([task['task'] for task in tasks])
 ax.set_ylabel('Tasks')
 
-# Title and display
+
+# Title and save plot
 plt.title('Gantt Chart Example')
 plt.tight_layout()
-plt.show()
+plt.savefig('/code/src/gantt_chart.png')  # Save the plot to a file
